@@ -1,0 +1,14 @@
+{
+  "name": "enets-payment",
+  "version": "1.0.0",
+  "description": "eNETS Payment Integration Project",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "body-parser": "^1.19.0",
+    "crypto": "^1.0.1"
+  }
+}

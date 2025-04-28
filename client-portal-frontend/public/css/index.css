@@ -1,0 +1,18 @@
+ /* Custom styles for hero section */
+.hero-section {
+    background: url('https://placehold.co/1600x800') no-repeat center center;
+    background-size: cover;
+    background-color: lavender;
+    height: 60vh;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;    
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+.service-card {
+    transition: transform 0.3s ease;
+}
+.service-card:hover {
+    transform: translateY(-10px);
+}

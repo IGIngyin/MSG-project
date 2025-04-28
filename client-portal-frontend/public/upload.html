@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Document - Client Portal</title>
+</head>
+<body>
+
+  <!-- Navbar Section -->
+  <div id="navbar-placeholder"></div>
+
+  <div class="container mt-5">
+    <h1 class="text-center">Upload Document</h1>
+
+    <div id="upload-section" class="mb-5">
+      <form id="upload-form" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label for="file-upload" class="form-label">File</label>
+          <input type="file" class="form-control" id="file-upload" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+      </form>
+    </div>
+  </div>
+
+   <!-- Footer Section -->
+   <div id="footer-placeholder"></div>
+
+  <script type="module" src="./scripts/upload.js"></script>
+</body>
+</html>

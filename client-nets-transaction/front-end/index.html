@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merchant Page</title>
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@3.1.9-1/crypto-js.js"></script>
+
+</head>
+<body>
+  <h1>Merchant Payment Page</h1>
+
+  <form id="paymentForm" action="https://sit2.enets.sg/MerchantApp/sim/b2sTxnEndURL.jsp" method="POST">
+    <input type="hidden" id="txnReq" name="txnReq" value="">
+    <input type="hidden" id="keyId" name="keyId" value="">
+    <input type="hidden" id="hmac" name="hmac" value="">
+    <button type="submit">Submit Payment</button>
+  </form>
+
+  <script>
+    // Generate txnReq JSON object
+    const generateTxnReq = () => {
+      const txnReq = {
+        ss: "1",
+        msg: {
+          txnAmount: "1000",
+          merchantTxnRef: "20170605 10:26:51.98",
+          b2sTxnEndURL: "https://sit2.enets.sg/MerchantApp/sim/b2sTxnEndURL.jsp",
+          s2sTxnEndURL: "https://sit2.enets.sg/MerchantApp/rest/s2sTxnEnd",
+          netsMid: "UMID_887770001",
+          merchantTxnDtm: "20170605 10:26:51.989",
+          submissionMode: "B",
+          paymentType: "SALE",
+          paymentMode: "",
+          clientType: "W",
+          currencyCode: "SGD",
+          merchantTimeZone: "+8:00",
+          netsMidIndicator: "U"
+        }
+      };
+      
+      return JSON.stringify(txnReq);
+    };
+
+    // Generate MAC value
+    const generateMAC = (txnReq, secretKey) => {
+      const concatPayloadAndSecretKey = txnReq + secretKey;
+      const hash = CryptoJS.SHA256(concatPayloadAndSecretKey).toString(CryptoJS.enc.Base64);
+      return hash;
+    };
+
+    window.onload = function() {
+      const txnReq = generateTxnReq();
+      const secretKey = "38a4b473-0295-439d-92e1-ad26a8c60279";  
+      const hmac = generateMAC(txnReq, secretKey);
+      
+      // Set the hidden form inputs
+      document.getElementById('txnReq').value = txnReq;
+      document.getElementById('keyId').value = secretKey;
+      document.getElementById('hmac').value = hmac;
+      
+      // Automatically submit the form
+      document.getElementById('paymentForm').submit();
+    };
+  </script>
+</body>
+</html>

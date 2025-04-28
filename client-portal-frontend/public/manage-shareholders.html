@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manage Shareholders</title>
+ </head>
+<body>
+
+    <!-- Navbar Section -->
+    <div id="navbar-placeholder"></div>
+
+    <h2 class="mb-4 text-center">Manage Shareholders</h2>
+
+    <div class="container mt-4">
+        <!-- Shareholder Form -->
+        <div class="card p-3 mb-4">
+            <h5 id="form-title">Add New Shareholder</h5>
+            <form id="shareholder-form">
+                <input type="hidden" id="shareholder-id">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" id="name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contact</label>
+                    <input type="text" id="contact" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ordinary Share Number</label>
+                    <input type="number" id="ordinaryShareNumber" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+                <button type="button" class="btn btn-secondary" id="reset-form-button">Cancel</button>
+            </form>
+        </div>
+
+        <!-- Shareholders Table -->
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Ordinary Share Number</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="shareholders-list"></tbody>
+        </table>
+
+        <br>
+        <a href="/profile.html" class="btn btn-secondary m-3"> Back </a>
+    </div>
+    
+    <!-- Footer Section -->
+    <div id="footer-placeholder"></div>
+    <script type="module" src="./scripts/manage-shareholders.js"></script>
+</body>
+</html>

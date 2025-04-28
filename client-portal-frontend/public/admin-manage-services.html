@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin - Manage Services</title>
+ </head>
+<body>
+
+    <!-- Navbar Section -->
+    <div id="navbar-placeholder"></div>
+
+    <h2 class="mb-4 text-center">Admin - Manage Services</h2>
+
+    <div class="container mt-4">
+        <!-- Service Form -->
+        <div class="card p-3 mb-4">
+            <h5 id="form-title">Add New Service</h5>
+            <form id="service-form">
+                <input type="hidden" id="service-id">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" id="name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <input type="text" id="description" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <input type="text" id="category" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Cost</label>
+                    <input type="number" id="cost" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+                <button type="button" class="btn btn-secondary" id="reset-form-button">Cancel</button>
+            </form>
+        </div>
+
+        <!-- Services Table -->
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Cost</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="service-list"></tbody>
+        </table>
+
+        <br>
+        <!--<a href="/profile.html" class="btn btn-secondary m-3"> Back </a>-->
+    </div>
+
+    <!-- Footer Section -->
+    <div id="footer-placeholder"></div>
+    <script type="module" src="./scripts/manage-services.js"></script>
+</body>
+</html>
