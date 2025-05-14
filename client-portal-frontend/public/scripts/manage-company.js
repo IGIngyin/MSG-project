@@ -49,7 +49,7 @@ async function fetchCompanies() {
       });
 
       row.querySelector(".edit-btn").addEventListener("click", () => {
-        editCompany(company._id);
+        editCompany(company);
       });
 
       row.querySelector(".delete-btn").addEventListener("click", () => {
@@ -65,60 +65,64 @@ async function fetchCompanies() {
 }
 
 // Create a new company and assign to login client, or update a company
-document
-  .getElementById("company-form")
-  .addEventListener("submit", async function (e) {
-    e.preventDefault();
+document.getElementById("company-form").addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-    // Get form data
-    const name = document.getElementById("company-name").value;
-    const description = document.getElementById("company-description").value;
-    const address = document.getElementById("company-address").value;
-    const ssic = document.getElementById("company-ssic").value;
-    const paidUpShareCapital = parseFloat(
-      document.getElementById("company-paid-up-capital").value
-    );
+  // Get form data
+  const name = document.getElementById("company-name").value;
+  const description = document.getElementById("company-description").value;
+  const address = document.getElementById("company-address").value;
+  const ssic = document.getElementById("company-ssic").value;
+  const paidUpShareCapital = parseFloat(
+    document.getElementById("company-paid-up-capital").value
+  );
 
-    const id = document.getElementById("company-id").value;
-    const method = id ? "PUT" : "POST";
-    const endpoint = id
-      ? `${API_BASE_URL}/companies/${id}`
-      : `${API_BASE_URL}/companies`;
+  const id = document.getElementById("company-id").value;
+  const method = id ? "PUT" : "POST";
+  const endpoint = id
+    ? `${API_BASE_URL}/companies/${id}`
+    : `${API_BASE_URL}/companies`;
 
-    try {
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          token: `${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          name,
-          description,
-          ssic,
-          address,
-          paidUpShareCapital,
-        }),
-      });
+  try {
+    const response = await fetch(endpoint, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        token: localStorage.getItem("token"),
+        selectedCompany: id || "" // Include selectedCompany header if updating
+      },
+      body: JSON.stringify({
+        name,
+        description,
+        ssic,
+        address,
+        paidUpShareCapital
+      }),
+    });
 
-      if (!response.ok) throw new Error("Failed to save company");
-      document.getElementById("company-form").reset();
-      window.location.reload();
-      fetchCompanies();
-    } catch (error) {
-      console.error(error);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to save company");
     }
-  });
+    
+    document.getElementById("company-form").reset();
+    fetchCompanies();
+  } catch (error) {
+    console.error("Save company error:", error);
+    alert(error.message);
+  }
+});
 
 // Edit company (pre-fill form)
-function editCompany(id, name, email, contact) {
-  document.getElementById("company-id").value = id;
-  document.getElementById("name").value = name;
-  document.getElementById("email").value = email;
-  document.getElementById("contact").value = contact;
+function editCompany(company) {
+  document.getElementById("company-id").value = company._id;
+  document.getElementById("company-name").value = company.name;
+  document.getElementById("company-description").value = company.description;
+  document.getElementById("company-address").value = company.address;
+  document.getElementById("company-ssic").value = company.ssic;
+  document.getElementById("company-paid-up-capital").value = company.paidUpShareCapital;
   document.getElementById("form-title").textContent = "Edit Company";
 }
-
 async function selectCompany(companyId) {
   // Check if companyId is valid
   if (!companyId) {
@@ -152,14 +156,20 @@ async function deleteCompany(id) {
     const response = await fetch(`${API_BASE_URL}/companies/${id}`, {
       method: "DELETE",
       headers: {
-        token: `${localStorage.getItem("token")}`,
+        token: localStorage.getItem("token"),
+        selectedCompany: id
       },
     });
 
-    if (!response.ok) throw new Error("Failed to delete company");
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to delete company");
+    }
+    
     fetchCompanies();
   } catch (error) {
     console.error(error);
+    alert(error.message);
   }
 }
 
