@@ -58,7 +58,8 @@ function validateForm(formData) {
   // Validation checks
   if (
     !formData.email ||
-    !formData.email.match(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/)
+    !formData.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|biz|info|name|pro|[a-zA-Z]{3,})$/)
+
   ) {
     valid = false;
     messages.push("Please enter a valid email address.");
@@ -69,10 +70,17 @@ function validateForm(formData) {
       "Please enter a password that is at least 8 characters long."
     );
   }
-  if (formData.password !== formData.confirmPassword) {
+  if (
+    !formData.password.match(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/
+    )
+  ) {
     valid = false;
-    messages.push("Passwords do not match.");
+    messages.push(
+      "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
+    );
   }
+  
 
   return messages;
 }
