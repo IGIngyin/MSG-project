@@ -12,12 +12,26 @@ async function fetchCompanies() {
   try {
     const response = await fetch(`${API_BASE_URL}/companies`, {
       headers: {
-        token: `${localStorage.getItem("token")}`,
+        token: localStorage.getItem("token"),
       },
     });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch companies");
+    }
+
     const companies = await response.json();
     const tableBody = document.getElementById("company-list");
     tableBody.innerHTML = "";
+
+    if (companies.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6" class="text-center">No companies found. Click "Add Company" to create one.</td>
+        </tr>
+      `;
+      return;
+    }
 
     companies.forEach((company) => {
       // Create row
@@ -27,14 +41,14 @@ async function fetchCompanies() {
       row.innerHTML = `
                 <td>${company.name}</td>
                 <td>${company.description}</td>
-                <td>${company.ssic}</td>
                 <td>${company.address}</td>
+                <td>${company.ssic}</td>
                 <td>${company.paidUpShareCapital}</td>
                 <td>
                     <button class="btn btn-success btn-sm select-btn">
-                        <i class="fa fa-option"></i> Select
+                        <i class="fa fa-check"></i> Select
                     </button>
-                    <button class="btn btn-warning btn-sm edit-btn">
+                    <button class="btn btn-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#companyModal">
                         <i class="fa fa-edit"></i> Edit
                     </button>
                     <button class="btn btn-danger btn-sm delete-btn">
@@ -61,14 +75,17 @@ async function fetchCompanies() {
     });
   } catch (error) {
     console.error("Failed to fetch companies", error);
+    const tableBody = document.getElementById("company-list");
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="6" class="text-center text-danger">Error loading companies: ${error.message}</td>
+      </tr>
+    `;
   }
 }
 
 // Create a new company and assign to login client, or update a company
-document.getElementById("company-form").addEventListener("submit", async function (e) {
-  e.preventDefault();
-
-  // Get form data
+document.getElementById("save-company-btn").addEventListener("click", async function() {
   const name = document.getElementById("company-name").value;
   const description = document.getElementById("company-description").value;
   const address = document.getElementById("company-address").value;
@@ -89,7 +106,7 @@ document.getElementById("company-form").addEventListener("submit", async functio
       headers: {
         "Content-Type": "application/json",
         token: localStorage.getItem("token"),
-        selectedCompany: id || "" // Include selectedCompany header if updating
+        selectedCompany: id || ""
       },
       body: JSON.stringify({
         name,
@@ -105,6 +122,8 @@ document.getElementById("company-form").addEventListener("submit", async functio
       throw new Error(errorData.error || "Failed to save company");
     }
     
+    // Close modal and refresh list
+    bootstrap.Modal.getInstance(document.getElementById('companyModal')).hide();
     document.getElementById("company-form").reset();
     fetchCompanies();
   } catch (error) {
@@ -113,7 +132,7 @@ document.getElementById("company-form").addEventListener("submit", async functio
   }
 });
 
-// Edit company (pre-fill form)
+// Edit company (pre-fill model)
 function editCompany(company) {
   document.getElementById("company-id").value = company._id;
   document.getElementById("company-name").value = company.name;
@@ -121,10 +140,18 @@ function editCompany(company) {
   document.getElementById("company-address").value = company.address;
   document.getElementById("company-ssic").value = company.ssic;
   document.getElementById("company-paid-up-capital").value = company.paidUpShareCapital;
-  document.getElementById("form-title").textContent = "Edit Company";
+  document.getElementById("companyModalLabel").textContent = "Edit Company";
 }
+
+// Reset form when modal is closed
+document.getElementById('companyModal').addEventListener('hidden.bs.modal', function () {
+  document.getElementById("company-id").value = "";
+  document.getElementById("company-form").reset();
+  document.getElementById("companyModalLabel").textContent = "Add New Company";
+});
+
+// Select company
 async function selectCompany(companyId) {
-  // Check if companyId is valid
   if (!companyId) {
     console.error("Invalid company ID");
     return;
@@ -134,14 +161,13 @@ async function selectCompany(companyId) {
     const response = await fetch(`${API_BASE_URL}/companies/${companyId}`, {
       method: "GET",
       headers: {
-        token: `${localStorage.getItem("token")}`,
-        selectedCompany: `${companyId}`,
+        token: localStorage.getItem("token"),
+        selectedCompany: companyId,
       },
     });
     if (!response.ok) throw new Error("Failed to get company");
     const company = await response.json();
     alert("Company: " + company.name + " selected.");
-    // Store the selected company id in localStorage
     localStorage.setItem("selectedCompany", companyId);
   } catch (error) {
     console.error(error);
@@ -172,16 +198,6 @@ async function deleteCompany(id) {
     alert(error.message);
   }
 }
-
-// Reset form
-document
-  .getElementById("reset-form-button")
-  .addEventListener("click", async function (e) {
-    e.preventDefault();
-    document.getElementById("company-id").value = "";
-    document.getElementById("company-form").reset();
-    document.getElementById("form-title").textContent = "Add New Company";
-  });
 
 // Load companies on page load
 fetchCompanies();
