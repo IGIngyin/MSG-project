@@ -90,11 +90,45 @@ router.post("/companies", verifyToken, async (req, res) => {
  *       500:
  *         description: Failed to retrieve companies
  */
+// router.get("/companies", verifyToken, async (req, res) => {
+//   try {
+//     const companies = await Company.find().populate(
+//       "secretary shareholder services"
+//     );
+//     res.status(200).json(companies);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Failed to retrieve companies" });
+//   }
+// });
+
+
+// GET ALL COMPANIES FOR LOGGED-IN USER
+/**
+ * @swagger
+ * /api/companies/companies:
+ *   get:
+ *     description: Get all companies for the logged-in user
+ *     responses:
+ *       200:
+ *         description: List of user's companies
+ *       500:
+ *         description: Failed to retrieve companies
+ */
 router.get("/companies", verifyToken, async (req, res) => {
   try {
-    const companies = await Company.find().populate(
-      "secretary shareholder services"
-    );
+    // Get the client first
+    const client = await Client.findById(req.user.id).populate('company');
+    
+    if (!client) {
+      return res.status(404).json({ error: "Client not found" });
+    }
+
+    // Get detailed information for each company
+    const companies = await Company.find({
+      _id: { $in: client.company }
+    }).populate("secretary shareholder services");
+
     res.status(200).json(companies);
   } catch (error) {
     console.error(error);
