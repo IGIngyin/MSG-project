@@ -15,25 +15,18 @@ async function fetchCompanies() {
         token: localStorage.getItem("token"),
       },
     });
+    if (!response.ok) throw new Error("Failed to fetch companies");
+    
+    const allCompanies = await response.json();
+    const clientCompanies = allCompanies.filter(company => {
+      // Check if company was added by the logged-in client via client-company association logic
+      return true; // backend already restricts it; placeholder if needed later
+    });
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch companies");
-    }
-
-    const companies = await response.json();
     const tableBody = document.getElementById("company-list");
     tableBody.innerHTML = "";
 
-    if (companies.length === 0) {
-      tableBody.innerHTML = `
-        <tr>
-          <td colspan="6" class="text-center">No companies found. Click "Add Company" to create one.</td>
-        </tr>
-      `;
-      return;
-    }
-
-    companies.forEach((company) => {
+    clientCompanies.forEach((company) => {
       // Create row
       const row = document.createElement("tr");
 
@@ -55,76 +48,73 @@ async function fetchCompanies() {
                         <i class="fa fa-trash"></i> Delete
                     </button>
                 </td>
-            `;
+                `;
 
       // Add event listeners to buttons
-      row.querySelector(".select-btn").addEventListener("click", () => {
-        selectCompany(company._id);
-      });
-
-      row.querySelector(".edit-btn").addEventListener("click", () => {
-        editCompany(company);
-      });
-
-      row.querySelector(".delete-btn").addEventListener("click", () => {
-        deleteCompany(company._id);
-      });
+      row.querySelector(".select-btn").addEventListener("click", () => 
+        selectCompany(company._id)
+    );
+      row.querySelector(".edit-btn").addEventListener("click", () => 
+        editCompany(company)
+    );
+      row.querySelector(".delete-btn").addEventListener("click", () => 
+        deleteCompany(company._id)
+    );
 
       // Append row to table
       tableBody.appendChild(row);
     });
   } catch (error) {
     console.error("Failed to fetch companies", error);
-    const tableBody = document.getElementById("company-list");
-    tableBody.innerHTML = `
-      <tr>
-        <td colspan="6" class="text-center text-danger">Error loading companies: ${error.message}</td>
-      </tr>
-    `;
   }
 }
 
 // Create a new company and assign to login client, or update a company
-document.getElementById("save-company-btn").addEventListener("click", async function() {
-  const name = document.getElementById("company-name").value;
-  const description = document.getElementById("company-description").value;
-  const address = document.getElementById("company-address").value;
-  const ssic = document.getElementById("company-ssic").value;
-  const paidUpShareCapital = parseFloat(
-    document.getElementById("company-paid-up-capital").value
-  );
+document
+  .getElementById("company-form")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  const id = document.getElementById("company-id").value;
-  const method = id ? "PUT" : "POST";
-  const endpoint = id
-    ? `${API_BASE_URL}/companies/${id}`
+    // Get form data
+    const name = document.getElementById("company-name").value;
+    const description = document.getElementById("company-description").value;
+    const address = document.getElementById("company-address").value;
+    const ssic = document.getElementById("company-ssic").value;
+    const paidUpShareCapital = parseFloat(document.getElementById("company-paid-up-capital").value);
+
+    const id = document.getElementById("company-id").value;
+    const method = id ? "PUT" : "POST";
+    const endpoint = id 
+    ? `${API_BASE_URL}/companies/${id}` 
     : `${API_BASE_URL}/companies`;
 
-  try {
-    const response = await fetch(endpoint, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        token: localStorage.getItem("token"),
-        selectedCompany: id || ""
-      },
-      body: JSON.stringify({
-        name,
-        description,
-        ssic,
-        address,
-        paidUpShareCapital
-      }),
-    });
+    try {
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+          selectedCompany: id || ""
+        },
+        body: JSON.stringify({
+          name,
+          description,
+          ssic,
+          address,
+          paidUpShareCapital,
+        }),
+      });
 
-    if (!response.ok) {
+      if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Failed to save company");
     }
-    
-    // Close modal and refresh list
-    bootstrap.Modal.getInstance(document.getElementById('companyModal')).hide();
+
     document.getElementById("company-form").reset();
+    document.getElementById("form-title").textContent = "Add New Company";
+    document.getElementById("company-id").value = "";
+    const modal = bootstrap.Modal.getInstance(document.getElementById("companyModal"));
+    modal.hide();
     fetchCompanies();
   } catch (error) {
     console.error("Save company error:", error);
@@ -132,7 +122,7 @@ document.getElementById("save-company-btn").addEventListener("click", async func
   }
 });
 
-// Edit company (pre-fill model)
+// Edit company (pre-fill form)
 function editCompany(company) {
   document.getElementById("company-id").value = company._id;
   document.getElementById("company-name").value = company.name;
@@ -140,34 +130,25 @@ function editCompany(company) {
   document.getElementById("company-address").value = company.address;
   document.getElementById("company-ssic").value = company.ssic;
   document.getElementById("company-paid-up-capital").value = company.paidUpShareCapital;
-  document.getElementById("companyModalLabel").textContent = "Edit Company";
+  document.getElementById("form-title").textContent = "Edit Company";
 }
 
-// Reset form when modal is closed
-document.getElementById('companyModal').addEventListener('hidden.bs.modal', function () {
-  document.getElementById("company-id").value = "";
-  document.getElementById("company-form").reset();
-  document.getElementById("companyModalLabel").textContent = "Add New Company";
-});
-
-// Select company
 async function selectCompany(companyId) {
-  if (!companyId) {
-    console.error("Invalid company ID");
-    return;
-  }
-
+  // Check if companyId is valid
+  if (!companyId) return;
+  
   try {
     const response = await fetch(`${API_BASE_URL}/companies/${companyId}`, {
       method: "GET",
       headers: {
         token: localStorage.getItem("token"),
-        selectedCompany: companyId,
+        selectedCompany: companyId
       },
     });
     if (!response.ok) throw new Error("Failed to get company");
     const company = await response.json();
     alert("Company: " + company.name + " selected.");
+    // Store the selected company id in localStorage
     localStorage.setItem("selectedCompany", companyId);
   } catch (error) {
     console.error(error);
@@ -191,7 +172,7 @@ async function deleteCompany(id) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Failed to delete company");
     }
-    
+
     fetchCompanies();
   } catch (error) {
     console.error(error);
