@@ -12,8 +12,8 @@ async function fetchSecretaries() {
   try {
     const response = await fetch(`${API_BASE_URL}/secretaries`, {
       headers: {
-        token: `${localStorage.getItem("token")}`,
-        selectedCompany: `${localStorage.getItem("selectedCompany")}`,
+        token: localStorage.getItem("token"),
+        selectedCompany: localStorage.getItem("selectedCompany"),
       },
     });
     const secretaries = await response.json();
@@ -30,7 +30,7 @@ async function fetchSecretaries() {
                 <td>${secretary.email}</td>
                 <td>${secretary.contact}</td>
                 <td>
-                    <button class="btn btn-warning btn-sm edit-btn">
+                    <button class="btn btn-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#secretaryModal">
                         <i class="fa fa-edit"></i> Edit
                     </button>
                     <button class="btn btn-danger btn-sm delete-btn">
@@ -41,12 +41,7 @@ async function fetchSecretaries() {
 
       // Add event listeners to buttons
       row.querySelector(".edit-btn").addEventListener("click", () => {
-        editSecretary(
-          secretary._id,
-          secretary.name,
-          secretary.email,
-          secretary.contact
-        );
+        editSecretary(secretary);
       });
 
       row.querySelector(".delete-btn").addEventListener("click", () => {
@@ -67,10 +62,10 @@ document
   .addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const id = document.getElementById("secretary-id").value;
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const contact = document.getElementById("contact").value;
+  const id = document.getElementById("secretary-id").value;
+  const name = document.getElementById("secretary-name").value;
+  const email = document.getElementById("secretary-email").value;
+  const contact = document.getElementById("secretary-contact").value;
 
     const method = id ? "PUT" : "POST";
     const endpoint = id
@@ -82,14 +77,18 @@ document
         method,
         headers: {
           "Content-Type": "application/json",
-          token: `${localStorage.getItem("token")}`,
-          selectedCompany: `${localStorage.getItem("selectedCompany")}`,
+          token: localStorage.getItem("token"),
+          selectedCompany: localStorage.getItem("selectedCompany"),
         },
         body: JSON.stringify({ name, email, contact }),
       });
 
       if (!response.ok) throw new Error("Failed to save secretary");
       document.getElementById("secretary-form").reset();
+      document.getElementById("form-title").textContent = "Add New Secretary";
+      document.getElementById("secretary-id").value = "";
+      const modal = bootstrap.Modal.getInstance(document.getElementById("secretaryModal"));
+      modal.hide();
       fetchSecretaries();
     } catch (error) {
       console.error(error);
@@ -97,11 +96,11 @@ document
   });
 
 // Edit secretary (pre-fill form)
-function editSecretary(id, name, email, contact) {
-  document.getElementById("secretary-id").value = id;
-  document.getElementById("name").value = name;
-  document.getElementById("email").value = email;
-  document.getElementById("contact").value = contact;
+function editSecretary(secretary) {
+  document.getElementById("secretary-id").value = secretary._id;
+  document.getElementById("secretary-name").value = secretary.name;
+  document.getElementById("secretary-email").value = secretary.email;
+  document.getElementById("secretary-contact").value = secretary.contact;
   document.getElementById("form-title").textContent = "Edit Secretary";
 }
 
@@ -113,8 +112,8 @@ async function deleteSecretary(id) {
     const response = await fetch(`${API_BASE_URL}/secretaries/${id}`, {
       method: "DELETE",
       headers: {
-        token: `${localStorage.getItem("token")}`,
-        selectedCompany: `${localStorage.getItem("selectedCompany")}`,
+        token: localStorage.getItem("token"),
+        selectedCompany: localStorage.getItem("selectedCompany"),
       },
     });
 
@@ -124,16 +123,6 @@ async function deleteSecretary(id) {
     console.error(error);
   }
 }
-
-// Reset form
-document
-  .getElementById("reset-form-button")
-  .addEventListener("click", async function (e) {
-    e.preventDefault();
-    document.getElementById("secretary-id").value = "";
-    document.getElementById("secretary-form").reset();
-    document.getElementById("form-title").textContent = "Add New Secretary";
-  });
 
 // Load secretaries on page load
 fetchSecretaries();
