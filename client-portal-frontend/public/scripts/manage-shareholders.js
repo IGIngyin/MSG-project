@@ -12,8 +12,8 @@ async function fetchShareholders() {
   try {
     const response = await fetch(`${API_BASE_URL}/shareholders`, {
       headers: {
-        token: `${localStorage.getItem("token")}`,
-        selectedCompany: `${localStorage.getItem("selectedCompany")}`,
+        token: localStorage.getItem("token"),
+        selectedCompany: localStorage.getItem("selectedCompany"),
       },
     });
     const shareholders = await response.json();
@@ -31,7 +31,7 @@ async function fetchShareholders() {
                 <td>${s.contact}</td>
                 <td>${s.ordinaryShareNumber}</td>
                 <td>
-                    <button class="btn btn-warning btn-sm edit-btn">
+                    <button class="btn btn-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#shareholderModal">
                         <i class="fa fa-edit"></i> Edit
                     </button>
                     <button class="btn btn-danger btn-sm delete-btn">
@@ -42,13 +42,7 @@ async function fetchShareholders() {
 
       // Add event listeners to buttons
       row.querySelector(".edit-btn").addEventListener("click", () => {
-        editShareholder(
-          s._id,
-          s.name,
-          s.email,
-          s.contact,
-          s.ordinaryShareNumber
-        );
+        editShareholder(s);
       });
 
       row.querySelector(".delete-btn").addEventListener("click", () => {
@@ -70,12 +64,10 @@ document
     e.preventDefault();
 
     const id = document.getElementById("shareholder-id").value;
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const contact = document.getElementById("contact").value;
-    const ordinaryShareNumber = document.getElementById(
-      "ordinaryShareNumber"
-    ).value;
+    const name = document.getElementById("shareholder-name").value;
+    const email = document.getElementById("shareholder-email").value;
+    const contact = document.getElementById("shareholder-contact").value;
+    const ordinaryShareNumber = document.getElementById("shareholder-ordinaryShareNumber").value;
 
     const method = id ? "PUT" : "POST";
     const endpoint = id
@@ -87,14 +79,18 @@ document
         method,
         headers: {
           "Content-Type": "application/json",
-          token: `${localStorage.getItem("token")}`,
-          selectedCompany: `${localStorage.getItem("selectedCompany")}`,
+          token: localStorage.getItem("token"),
+          selectedCompany: localStorage.getItem("selectedCompany"),
         },
         body: JSON.stringify({ name, email, contact, ordinaryShareNumber }),
       });
 
       if (!response.ok) throw new Error("Failed to save shareholder");
       document.getElementById("shareholder-form").reset();
+      document.getElementById("form-title").textContent = "Add New Shareholder";
+      document.getElementById("shareholder-id").value = "";
+      const modal = bootstrap.Modal.getInstance(document.getElementById("shareholderModal"));
+      modal.hide();
       fetchShareholders();
     } catch (error) {
       console.error(error);
@@ -102,12 +98,12 @@ document
   });
 
 // Edit shareholder (pre-fill form)
-function editShareholder(id, name, email, contact, ordinaryShareNumber) {
-  document.getElementById("shareholder-id").value = id;
-  document.getElementById("name").value = name;
-  document.getElementById("email").value = email;
-  document.getElementById("contact").value = contact;
-  document.getElementById("ordinaryShareNumber").value = ordinaryShareNumber;
+function editShareholder(s) {
+  document.getElementById("shareholder-id").value = s._id;
+  document.getElementById("shareholder-name").value = s.name;
+  document.getElementById("shareholder-email").value = s.email;
+  document.getElementById("shareholder-contact").value = s.contact;
+  document.getElementById("shareholder-ordinaryShareNumber").value = s.ordinaryShareNumber;
   document.getElementById("form-title").textContent = "Edit Shareholder";
 }
 
@@ -119,8 +115,8 @@ async function deleteShareholder(id) {
     const response = await fetch(`${API_BASE_URL}/shareholders/${id}`, {
       method: "DELETE",
       headers: {
-        token: `${localStorage.getItem("token")}`,
-        selectedCompany: `${localStorage.getItem("selectedCompany")}`,
+        token: localStorage.getItem("token"),
+        selectedCompany: localStorage.getItem("selectedCompany"),
       },
     });
 
@@ -130,16 +126,6 @@ async function deleteShareholder(id) {
     console.error(error);
   }
 }
-
-// Reset form
-document
-  .getElementById("reset-form-button")
-  .addEventListener("click", async function (e) {
-    e.preventDefault();
-    document.getElementById("shareholder-id").value = "";
-    document.getElementById("shareholder-form").reset();
-    document.getElementById("form-title").textContent = "Add New Shareholder";
-  });
 
 // Load shareholders on page load
 fetchShareholders();
