@@ -25,15 +25,15 @@ window.deselectCompany = function (companyId) {
 // Fetch available services from the API
 async function fetchProfile() {
   try {
-    const response = await fetch("api/clients/clients", {
+    const clientRes = await fetch("api/clients/clients", {
       headers: {
         token: localStorage.getItem("token"),
       },
     });
 
-    if (!response.ok) return (window.location.href = "/index.html");
+    if (!clientRes.ok) return (window.location.href = "/index.html");
 
-    const clientData = await Response.json();
+    const clientData = await clientRes.json();
     const selectedCompanies = JSON.parse(localStorage.getItem("selectedCompanies")) || [];
 
     // Personal Info company input HTML
@@ -212,6 +212,7 @@ if (selectedCompanies.length > 0) {
       "<p>An error occurred while fetching profile data. Please try again later.</p>";
   }
 }
+
 
 // Initial call to load profile
 document.addEventListener("DOMContentLoaded",
