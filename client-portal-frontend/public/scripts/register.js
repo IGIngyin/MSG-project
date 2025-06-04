@@ -40,12 +40,9 @@ document
       const responseData = await response.json();
 
       if (response.ok) {
-  alert(responseData.message);
-  // Store email to use in OTP page
-  localStorage.setItem("pendingEmail", formData.email);
-  window.location.href = "otp.html";
-}
- else {
+        alert(responseData.message);
+        window.location.href = "login.html";
+      } else {
         throw new Error(responseData.error || "Registration failed");
       }
     } catch (error) {
