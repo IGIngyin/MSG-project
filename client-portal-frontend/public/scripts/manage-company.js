@@ -18,15 +18,13 @@ async function fetchCompanies() {
     if (!response.ok) throw new Error("Failed to fetch companies");
     
     const allCompanies = await response.json();
-    const clientCompanies = allCompanies.filter(company => {
-      // Check if company was added by the logged-in client via client-company association logic
-      return true; // backend already restricts it; placeholder if needed later
-    });
+    const selectedCompanies = JSON.parse(localStorage.getItem("selectedCompanies")) || [];
 
     const tableBody = document.getElementById("company-list");
     tableBody.innerHTML = "";
 
-    clientCompanies.forEach((company) => {
+    allCompanies.forEach((company) => {
+      const isSelected = selectedCompanies.includes(company._id);
       // Create row
       const row = document.createElement("tr");
 
@@ -38,8 +36,8 @@ async function fetchCompanies() {
                 <td>${company.ssic}</td>
                 <td>${company.paidUpShareCapital}</td>
                 <td>
-                    <button class="btn btn-success btn-sm select-btn">
-                        <i class="fa fa-check"></i> Select
+                    <button class="btn btn-${isSelected ? "secondary" : "success"} btn-sm toggle-select-btn">
+                        <i class="fa fa-${isSelected ? "times" : "check"}"></i> ${isSelected ? "Deselect" : "Select"}
                     </button>
                     <button class="btn btn-warning btn-sm edit-btn" data-bs-toggle="modal" data-bs-target="#companyModal">
                         <i class="fa fa-edit"></i> Edit
@@ -48,18 +46,20 @@ async function fetchCompanies() {
                         <i class="fa fa-trash"></i> Delete
                     </button>
                 </td>
-                `;
+              `;
 
       // Add event listeners to buttons
-      row.querySelector(".select-btn").addEventListener("click", () => 
-        selectCompany(company._id)
-    );
-      row.querySelector(".edit-btn").addEventListener("click", () => 
+      row.querySelector(".toggle-select-btn").addEventListener("click", () => {
+        toggleCompanySelection(company._id);
+      });
+
+      row.querySelector(".edit-btn").addEventListener("click", () =>
         editCompany(company)
-    );
-      row.querySelector(".delete-btn").addEventListener("click", () => 
+      );
+
+      row.querySelector(".delete-btn").addEventListener("click", () =>
         deleteCompany(company._id)
-    );
+      );
 
       // Append row to table
       tableBody.appendChild(row);
@@ -67,6 +67,21 @@ async function fetchCompanies() {
   } catch (error) {
     console.error("Failed to fetch companies", error);
   }
+}
+
+async function toggleCompanySelection(companyId) {
+  let selectedCompanies = JSON.parse(localStorage.getItem("selectedCompanies")) || [];
+
+  if (selectedCompanies.includes(companyId)) {
+    selectedCompanies = selectedCompanies.filter((id) => id !== companyId);
+    alert("Company deselected.");
+  } else {
+    selectedCompanies.push(companyId);
+    alert("Company selected.");
+  }
+
+  localStorage.setItem("selectedCompanies", JSON.stringify(selectedCompanies));
+  fetchCompanies(); // Refresh button state
 }
 
 // Create a new company and assign to login client, or update a company
@@ -134,24 +149,14 @@ function editCompany(company) {
 }
 
 async function selectCompany(companyId) {
-  // Check if companyId is valid
-  if (!companyId) return;
-  
-  try {
-    const response = await fetch(`${API_BASE_URL}/companies/${companyId}`, {
-      method: "GET",
-      headers: {
-        token: localStorage.getItem("token"),
-        selectedCompany: companyId
-      },
-    });
-    if (!response.ok) throw new Error("Failed to get company");
-    const company = await response.json();
-    alert("Company: " + company.name + " selected.");
-    // Store the selected company id in localStorage
-    localStorage.setItem("selectedCompany", companyId);
-  } catch (error) {
-    console.error(error);
+  let selectedCompanies = JSON.parse(localStorage.getItem("selectedCompanies")) || [];
+
+  if (!selectedCompanies.includes(companyId)) {
+    selectedCompanies.push(companyId);
+    localStorage.setItem("selectedCompanies", JSON.stringify(selectedCompanies));
+    alert("Company added to selection.");
+  } else {
+    alert("Company already selected.");
   }
 }
 
