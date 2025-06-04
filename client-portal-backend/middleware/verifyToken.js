@@ -1,3 +1,5 @@
+
+
 // const jwt = require("jsonwebtoken"); // For JWT token verification
 
 // // Secret key for JWT (make sure to store it securely in a real app)
@@ -26,10 +28,30 @@
 
 // module.exports = verifyToken;
 
+
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.JWT_SECRET;
 
 function verifyToken(req, res, next) {
+
+  const authHeader = req.header("Authorization");
+
+  const token = authHeader && authHeader.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : null;
+
+  if (!token) {
+    return res.status(401).json({ message: "Access denied. No token provided." });
+  }
+
+  try {
+    const decoded = jwt.verify(token, secretKey);
+    req.user = decoded; // contains id and role
+    next();
+  } catch (error) {
+    return res.status(400).json({ message: "Invalid token." });
+  }
+
     const rawHeader = req.header("token"); // from Postman
     if (!rawHeader) {
         return res.status(401).json({ message: "No token provided." });
@@ -50,6 +72,7 @@ function verifyToken(req, res, next) {
         console.error("Token verification failed:", error.message);
         return res.status(400).json({ message: "Invalid or expired token." });
     }
+
 }
 
 module.exports = verifyToken;
