@@ -1,55 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Register - Client Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    body {
+  background-color: #f8f9fa;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.register-container {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-image {
+  flex: 1 1 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #f2f2f2;
+}
+
+.register-image img {
+  max-width: 90%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.register-form-wrapper {
+  flex: 1 1 50%;
+  padding: 40px;
+  background-color: #ffffff;
+}
+
+.register-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.register-title img {
+  height: 40px;
+}
+
+/* ✅ Rounded input fields */
+.form-control {
+  border-radius: 999px !important;
+  padding: 12px 18px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+}
+.form-control:focus {
+  border-color: #000 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+
+/* ✅ Register button always black */
+.btn-register {
+  border-radius: 999px;
+  background-color: #000 !important;
+  color: #fff !important;
+  font-size: 15px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.btn-register:hover {
+  background-color: #111 !important;
+}
+
+.divider {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+  color: #999;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #ccc;
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.google-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #444;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.google-button:hover {
+  background-color: #f1f1f1;
+}
+
+.google-button i {
+  margin-right: 10px;
+}
+
+.policy-text {
+  font-size: 12px;
+  color: #666;
+  margin-top: 16px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .register-container {
+    flex-direction: column;
+  }
+
+  .register-image, .register-form-wrapper {
+    flex: 1 1 100%;
+  }
+}
+
+  </style>
 </head>
 <body>
 
-  <!-- Navbar Section -->
-  <div id="navbar-placeholder"></div>
+<!-- Navbar Section -->
+<div id="navbar-placeholder"></div>
 
-  <div class="container mt-5">
-    <h1 class="text-center">Register</h1>
+<div class="register-container">
+
+  <!-- Left-side Image -->
+  <div class="register-image">
+    <img src="assets/image.jpg" alt="Register Illustration">
+  </div>
+
+  <!-- Right-side Form -->
+  <div class="register-form-wrapper container">
+    <div class="register-title">
+      <img src="assets/logo.png" alt="Logo">
+      <h2 class="mb-0">Create an Account</h2>
+    </div>
 
     <!-- Validation Message Area -->
-    <div id="validation-messages" class="mb-4"></div>
+    <div id="validation-messages" class="mb-3 text-danger text-center"></div>
 
-    <div id="register-section" class="mb-5">
+    <div id="register-section" class="mb-4">
       <form id="register-form">
         <div class="mb-3">
-          <label for="register-email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="register-email" required>
+          <input type="email" class="form-control" id="register-email" placeholder="Email" required>
           <div class="invalid-feedback">
             Please enter a valid email address.
           </div>
         </div>
 
         <div class="mb-3">
-          <label for="register-password" class="form-label">Password</label>
-          <input type="password" class="form-control" id="register-password" required>
+          <input type="password" class="form-control" id="register-password" placeholder="Password" required>
           <div class="invalid-feedback">
             Please enter a password that is at least 8 characters long.
           </div>
         </div>
 
         <div class="mb-3">
-          <label for="register-confirm-password" class="form-label">Confirm Password</label>
-          <input type="password" class="form-control" id="register-confirm-password" required>
+          <input type="password" class="form-control" id="register-confirm-password" placeholder="Confirm Password" required>
           <div class="invalid-feedback">
             Please confirm your password.
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Register</button>
+        <button type="submit" class="btn btn-register w-100">Register</button>
       </form>
     </div>
+
+    <!-- Divider -->
+    <div class="divider">or continue with</div>
+
+    <!-- Google Button -->
+    <div class="google-button">
+      <i class="fab fa-google"></i> Sign up with Google
+    </div>
+
+    <!-- Policy Text -->
+    <div class="policy-text">
+      By creating an account, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.
+    </div>
   </div>
+</div>
 
-  <!-- Footer Section -->
-  <div id="footer-placeholder"></div>
+<!-- Footer Section -->
+<div id="footer-placeholder"></div>
 
-  <script type="module" src="./scripts/register.js"></script>
+<script type="module" src="./scripts/register.js"></script>
 </body>
 </html>

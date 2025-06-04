@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OTP Verification</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #f0f4f8, #dfe9f3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .otp-container {
+      background-color: white;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .otp-container h2 {
+      margin-bottom: 8px;
+      font-size: 24px;
+      color: #333;
+    }
+
+    .otp-container p {
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    .otp-boxes {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .otp-boxes input {
+      width: 50px;
+      height: 55px;
+      font-size: 24px;
+      text-align: center;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .otp-boxes input:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+      outline: none;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #otp-message, #resend-status {
+      color: #d33;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    #resend-btn {
+      background-color: transparent;
+      color: #007bff;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+      text-decoration: underline;
+    }
+
+    #resend-btn:disabled {
+      color: #888;
+      cursor: not-allowed;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="otp-container">
+    <h2>Email Verification</h2>
+    <p>Enter the 6-digit OTP sent to your email</p>
+
+    <form id="otp-form">
+      <div class="otp-boxes">
+        <input type="text" maxlength="1" class="otp-digit" />
+        <input type="text" maxlength="1" class="otp-digit" />
+        <input type="text" maxlength="1" class="otp-digit" />
+        <input type="text" maxlength="1" class="otp-digit" />
+        <input type="text" maxlength="1" class="otp-digit" />
+        <input type="text" maxlength="1" class="otp-digit" />
+      </div>
+      <button type="submit">Verify</button>
+    </form>
+
+    <div id="otp-message"></div>
+    <p id="resend-status"></p>
+    <button type="button" id="resend-btn">Resend OTP</button>
+  </div>
+
+  <script src="./scripts/otp.js"></script>
+</body>
+</html>
