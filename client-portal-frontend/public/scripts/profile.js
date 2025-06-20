@@ -198,6 +198,11 @@ if (selectedCompanies.length > 0) {
                     : "<li>No services available.</li>"
                 }
               </ul>
+              <div class="d-flex justify-content-end mt-3">
+          <a href="/manage-document.html" class="btn btn-primary btn-sm" onclick="localStorage.setItem('selectedCompany', '${companyId}')">
+            Manage Documents
+          </a>
+        </div>
             </div>
           </div>
         </div>
