@@ -71,6 +71,7 @@ app.use("/api/secretaries", require("./routes/secretaryRoutes"));
 app.use("/api/shareholders", require("./routes/shareholderRoutes"));
 app.use("/api/service", require("./routes/serviceRoutes"));
 app.use("/api/transactions", require("./routes/transactionRoutes"));
+app.use("/api/documents", require("./routes/documentRoutes"));
 
 // Start the server
 app.listen(PORT, () => {
