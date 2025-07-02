@@ -57,7 +57,7 @@ async function loadDocuments() {
 }
 
 window.deleteDocument = async function (index) {
-  const res = await fetch(`/api/companies/companies/${companyId}/documents/${index}`, {
+  const res = await fetch(`/api/documents/${companyId}/documents/${index}`, {
     method: "DELETE",
     headers: {
       token: localStorage.getItem("token"),
@@ -72,5 +72,6 @@ window.deleteDocument = async function (index) {
     alert("Delete failed");
   }
 };
+
 
 loadDocuments();

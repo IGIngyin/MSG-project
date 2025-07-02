@@ -37,44 +37,44 @@ async function fetchProfile() {
     const selectedCompanies = JSON.parse(localStorage.getItem("selectedCompanies")) || [];
 
     // Personal Info company input HTML
-   let personalCompanyInputs = "";
+    let personalCompanyInputs = "";
 
-if (selectedCompanies.length > 0) {
-  const companyNames = [];
+    if (selectedCompanies.length > 0) {
+      const companyNames = [];
 
-  for (const id of selectedCompanies) {
-    try {
-      const res = await fetch(`api/companies/companies/${id}`, {
-        headers: {
-          token: localStorage.getItem("token"),
-          selectedCompany: id,
-        },
-      });
+      for (const id of selectedCompanies) {
+        try {
+          const res = await fetch(`api/companies/companies/${id}`, {
+            headers: {
+              token: localStorage.getItem("token"),
+              selectedCompany: id,
+            },
+          });
 
-      if (res.ok) {
-        const data = await res.json();
-        companyNames.push({ id, name: data.name });
-      } else {
-        companyNames.push({ id, name: "Unknown Company" });
+          if (res.ok) {
+            const data = await res.json();
+            companyNames.push({ id, name: data.name });
+          } else {
+            companyNames.push({ id, name: "Unknown Company" });
+          }
+        } catch {
+          companyNames.push({ id, name: "Error loading company" });
+        }
       }
-    } catch {
-      companyNames.push({ id, name: "Error loading company" });
-    }
-  }
 
-  personalCompanyInputs = companyNames
-    .map(
-      (c, index) => `
+      personalCompanyInputs = companyNames
+        .map(
+          (c, index) => `
         <div class="input-group mb-2">
           <input type="text" class="form-control" value="${c.name}" disabled />
           <button class="btn btn-outline-danger" onclick="removeCompanyByIndex(${index})">Deselect Company</button>
         </div>
       `
-    )
-    .join("");
-} else {
-  personalCompanyInputs = `<input type="text" class="form-control" value="No company selected" disabled />`;
-}
+        )
+        .join("");
+    } else {
+      personalCompanyInputs = `<input type="text" class="form-control" value="No company selected" disabled />`;
+    }
 
 
     // Build personal info section first
@@ -141,68 +141,62 @@ if (selectedCompanies.length > 0) {
                 <a href="/manage-secretary.html" class="btn btn-primary btn-sm" onclick="localStorage.setItem('selectedCompany', '${companyId}')">Manage Secretaries</a>
               </div>
               <hr />
-              ${
-                companyData.secretary.length
-                  ? companyData.secretary
-                      .map(
-                        (s) => `
+              ${companyData.secretary.length
+          ? companyData.secretary
+            .map(
+              (s) => `
                 <p><strong>Name:</strong> ${s.name}<br>
                 <strong>Email:</strong> ${s.email}<br>
                 <strong>Contact:</strong> ${s.contact}</p><hr>`
-                      )
-                      .join("")
-                  : "<p>No secretaries.</p>"
-              }
+            )
+            .join("")
+          : "<p>No secretaries.</p>"
+        }
 
               <div class="d-flex justify-content-between align-items-center mt-3">
                 <h5 class="mb-0">Shareholder Information</h5>
                 <a href="/manage-shareholders.html" class="btn btn-primary btn-sm" onclick="localStorage.setItem('selectedCompany', '${companyId}')">Manage Shareholders</a>
               </div>
               <hr />
-              ${
-                companyData.shareholder.length
-                  ? companyData.shareholder
-                      .map(
-                        (sh) => `
+              ${companyData.shareholder.length
+          ? companyData.shareholder
+            .map(
+              (sh) => `
                 <p><strong>Name:</strong> ${sh.name}<br>
                 <strong>Email:</strong> ${sh.email}<br>
                 <strong>Contact:</strong> ${sh.contact}<br>
                 <strong>Ordinary Shares:</strong> ${sh.ordinaryShareNumber}</p><hr>`
-                      )
-                      .join("")
-                  : "<p>No shareholders.</p>"
-              }
-
-              <h5 class="mt-3">Documents</h5>
-              <ul>
-                ${
-                  companyData.documents.length
-                    ? companyData.documents
-                        .map(
-                          (doc) => `
+            )
+            .join("")
+          : "<p>No shareholders.</p>"
+        }
+              
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <h5 class="mb-0">Documents</h5>
+                <a href="/manage-document.html" class="btn btn-primary btn-sm" onclick="localStorage.setItem('selectedCompany', '${companyId}')">Manage Documents</a>
+              </div>
+              <hr />            
+                ${companyData.documents.length
+          ? companyData.documents
+            .map(
+              (doc) => `
                     <li>
                       <a href="data:application/octet-stream;base64,${doc.path}" download="${doc.filename}" target="_blank">${doc.filename}</a>
                       (Uploaded on ${new Date(doc.uploadedAt).toLocaleDateString()})
                     </li>`
-                        )
-                        .join("")
-                    : "<li>No documents available.</li>"
-                }
-              </ul>
+            )
+            .join("")
+          : "<li>No documents available.</li>"
+        }
 
               <h5 class="mt-3">Services</h5>
               <ul>
-                ${
-                  companyData.services.length
-                    ? companyData.services.map((s) => `<li>${s.name}</li>`).join("")
-                    : "<li>No services available.</li>"
-                }
+                ${companyData.services.length
+          ? companyData.services.map((s) => `<li>${s.name}</li>`).join("")
+          : "<li>No services available.</li>"
+        }
               </ul>
-              <div class="d-flex justify-content-end mt-3">
-          <a href="/manage-document.html" class="btn btn-primary btn-sm" onclick="localStorage.setItem('selectedCompany', '${companyId}')">
-            Manage Documents
-          </a>
-        </div>
+
             </div>
           </div>
         </div>
