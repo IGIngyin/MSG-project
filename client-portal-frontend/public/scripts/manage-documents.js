@@ -1,4 +1,10 @@
-// scripts/manage-documents.js
+import { displayNav, loadScripts } from "./common.js"; // Import the function from common.js
+
+// Load the navbar HTML content into the placeholder
+displayNav();
+// Load all css/js scripts
+loadScripts();
+
 const API = "/api/companies/companies/upload";
 const companyId = localStorage.getItem("selectedCompany");
 
@@ -44,34 +50,48 @@ async function loadDocuments() {
     return;
   }
 
-  data.documents.forEach((doc, index) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <a href="data:application/pdf;base64,${doc.path}" target="_blank" download="${doc.filename}">
-        ${doc.filename}
+data.documents.forEach((doc, index) => {
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${doc.filename}</td>
+    <td>
+      <a href="data:application/pdf;base64,${doc.path}" target="_blank" class="btn btn-sm btn-success me-2" download="${doc.filename}">
+        <i class="fa fa-download"></i> Download
       </a>
-      <button onclick="deleteDocument(${index})">Delete</button>
-    `;
-    list.appendChild(li);
+      <button class="btn btn-danger btn-sm delete-btn">
+        <i class="fa fa-trash"></i> Delete
+      </button>
+    </td>
+  `;
+
+  row.querySelector(".delete-btn").addEventListener("click", () => {
+    deleteDocument(index);
   });
+
+  list.appendChild(row);
+});
+
 }
 
-window.deleteDocument = async function (index) {
-  const res = await fetch(`/api/documents/${companyId}/documents/${index}`, {
-    method: "DELETE",
-    headers: {
-      token: localStorage.getItem("token"),
-      selectedCompany: companyId,
-    },
-  });
+async function deleteDocument(index) {
+  if (!confirm("Are you sure you want to delete this document?")) return;
 
-  if (res.ok) {
-    alert("Deleted");
+  try {
+    const response = await fetch(`/api/documents/${companyId}/documents/${index}`, {
+      method: "DELETE",
+      headers: {
+        token: localStorage.getItem("token"),
+        selectedCompany: companyId,
+      },
+    });
+
+    if (!response.ok) throw new Error("Failed to delete document");
+
     loadDocuments();
-  } else {
-    alert("Delete failed");
+  } catch (error) {
+    console.error(error);
   }
-};
+}
 
 
 loadDocuments();
