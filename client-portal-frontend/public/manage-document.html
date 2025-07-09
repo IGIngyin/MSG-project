@@ -1,21 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Manage Documents</title>
 </head>
+
 <body>
-  <h2>Manage Documents</h2>
-  <form id="uploadForm">
-    <input type="file" id="fileInput" required />
-    <button type="submit">Upload</button>
-  </form>
+  <!-- Navbar -->
+  <div id="navbar-placeholder"></div>
 
-  <div id="uploadStatus"></div>
-  <ul id="documentList"></ul>
-    <a href="/profile.html" class="btn btn-secondary m-3"> Back </a>
+  <h2 class="mb-4 text-center">Manage Documents</h2>
 
-  
+  <div class="container mt-4">
+    <!-- Upload Form -->
+    <div class="d-flex justify-content-end mb-3">
+      <form id="uploadForm" class="d-flex gap-2">
+        <input type="file" id="fileInput" class="form-control" required />
+        <button type="submit" class="btn btn-primary">
+          <i class="fa fa-upload"></i> Upload
+        </button>
+      </form>
+    </div>
+
+    <!-- Upload Status -->
+    <div id="uploadStatus" class="mb-3 text-success"></div>
+
+    <!-- Document Table -->
+    <table class="table table-bordered">
+      <thead class="table-dark">
+        <tr>
+          <th>Filename</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="documentList"></tbody>
+    </table>
+
+    <a href="/profile.html" class="btn btn-secondary m-3">Back</a>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
+
   <script type="module" src="./scripts/manage-documents.js"></script>
 </body>
+
 </html>
