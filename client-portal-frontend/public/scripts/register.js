@@ -12,10 +12,13 @@ document
 
     // Gather form data
     const formData = {
+      name: document.getElementById("register-name").value,
       email: document.getElementById("register-email").value,
       password: document.getElementById("register-password").value,
       confirmPassword: document.getElementById("register-confirm-password")
         .value,
+      phone: document.getElementById("register-phone").value
+
     };
 
     // Validate form data
@@ -57,6 +60,11 @@ function validateForm(formData) {
 
   // Validation checks
   if (
+    !formData.name || formData.name.trim().length < 2) {
+    messages.push("Please enter a valid name.");
+  }
+
+  if (
     !formData.email ||
     !formData.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|biz|info|name|pro|[a-zA-Z]{3,})$/)
 
@@ -79,6 +87,10 @@ function validateForm(formData) {
     messages.push(
       "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
     );
+  }
+  if (
+    !formData.phone || !formData.phone.match(/^\d{8}$/)) {
+    messages.push("Please enter a valid 8-digit phone number.");
   }
   
 

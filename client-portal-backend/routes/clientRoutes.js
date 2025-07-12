@@ -41,14 +41,14 @@ const router = express.Router();
  */
 router.post("/register", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password, phone } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password || !password || !phone) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newClient = new Client({ email, password: hashedPassword });
+    const newClient = new Client({ name, email, password: hashedPassword, phone });
 
     await newClient.save();
     res.status(201).json({ message: "Client registered successfully" });
