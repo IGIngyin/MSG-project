@@ -174,4 +174,64 @@ router.post("/credits/purchase", verifyToken, async (req, res) => {
   }
 });
 
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+
+// Forgot password
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+  try {
+    const client = await Client.findOne({ email });
+    if (!client) {
+      return res.status(404).json({ error: "Client not found" });
+    }
+
+    const token = jwt.sign({ id: client._id }, process.env.JWT_SECRET, { expiresIn: "10m" });
+    const resetLink = `${process.env.CLIENT_URL}/reset-password.html?token=${token}`;
+
+    // Send email using Nodemailer
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD
+      }
+    });
+
+    await transporter.sendMail({
+      from: `"Client Portal" <${process.env.EMAIL_USERNAME}>`,
+      to: email,
+      subject: "Reset your password",
+      html: `
+        <p>You requested to reset your password.</p>
+        <p><a href="${resetLink}">Click here to reset it</a></p>
+        <p>This link expires in 10 minutes.</p>
+      `
+    });
+
+    res.status(200).json({ message: "Password reset link sent to your email" });
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    res.status(500).json({ error: "Something went wrong. Try again later." });
+  }
+});
+
+// Reset password
+router.post("/reset-password/:token", async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await Client.findByIdAndUpdate(decoded.id, { password: hashedPassword });
+
+    res.status(200).json({ message: "Password has been reset successfully." });
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    res.status(400).json({ error: "Invalid or expired token." });
+  }
+});
+
 module.exports = router;
