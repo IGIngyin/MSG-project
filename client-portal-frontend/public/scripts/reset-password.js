@@ -19,6 +19,23 @@ document.getElementById("reset-password-form").addEventListener("submit", async 
     messageDiv.innerHTML = `<div class="alert alert-danger">Passwords do not match.</div>`;
     return;
   }
+  const validationMessages = [];
+
+  if (password.length < 8) {
+    validationMessages.push("Password must be at least 8 characters long.");
+  }
+  if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/)) {
+    validationMessages.push(
+      "Password must include uppercase, lowercase, number, and special character."
+    );
+  }
+
+  if (validationMessages.length > 0) {
+    messageDiv.innerHTML = validationMessages.map(msg =>
+      `<div class="alert alert-danger">${msg}</div>`
+    ).join("");
+    return;
+  }
 
   try {
     const response = await fetch(`/api/clients/reset-password/${token}`, {

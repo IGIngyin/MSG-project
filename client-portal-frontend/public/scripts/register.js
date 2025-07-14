@@ -88,6 +88,10 @@ function validateForm(formData) {
       "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
     );
   }
+   if (formData.password !== formData.confirmPassword) {
+    valid = false;
+    messages.push("Password and Confirm Password do not match.");
+  }
   if (
     !formData.phone || !formData.phone.match(/^\d{8}$/)) {
     messages.push("Please enter a valid 8-digit phone number.");
