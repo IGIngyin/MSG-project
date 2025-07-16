@@ -1,70 +1,95 @@
-// const express = require("express");
-// const bcrypt = require("bcryptjs");
-// const jwt = require("jsonwebtoken");
-// const Admin = require("../models/Admin");
-// const Client = require("../models/Client");
-// const verifyToken = require("../middleware/verifyToken");
-// const isAdmin = require("../middleware/isAdmin"); // Optional middleware for role check
+const express = require('express');
+const router = express.Router();
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User'); 
+const Client = require('../models/Client');
+const Company = require("../models/Company");
+const { verifyAdminToken } = require('../middleware/authmiddleware');
 
-// const router = express.Router();
+// ========================
+// Function to generate JWT token
+// ========================
+const generateToken = (user) => {
+  return jwt.sign(
+    { userId: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' }  // Token will expire in 1 hour
+  );
+};
 
-// // ✅ Admin Registration
-// router.post("/register", async (req, res) => {
-//     try {
-//         const { name, email, password } = req.body;
+// ========================
+// Admin Registration Route
+// ========================
+router.post('/register-admin', async (req, res) => {
+  const { email, password, adminCode } = req.body;
 
-//         const existingAdmin = await Admin.findOne({ email });
-//         if (existingAdmin) {
-//             return res.status(400).json({ message: "Admin already exists" });
-//         }
+  const expectedCode = 'msgadmin123'; // Your private admin registration code
 
-//         const hashedPassword = await bcrypt.hash(password, 10);
-//         const newAdmin = new Admin({ name, email, password: hashedPassword });
+  if (adminCode !== expectedCode) {
+    return res.status(403).json({ success: false, message: 'Invalid admin code' });
+  }
 
-//         await newAdmin.save();
-//         res.status(201).json({ message: "Admin registered successfully" });
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// });
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ success: false, message: 'Email already exists' });
+    }
 
-// // ✅ Admin Login
-// router.post("/login", async (req, res) => {
-//     try {
-//         const { email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-//         const admin = await Admin.findOne({ email });
-//         if (!admin || !(await bcrypt.compare(password, admin.password))) {
-//             return res.status(400).json({ message: "Invalid credentials" });
-//         }
+    const newAdmin = new User({
+      email,
+      password: hashedPassword,
+      role: 'admin'
+    });
 
-//         const token = jwt.sign(
-//             { id: admin._id, role: "admin" },
-//             process.env.JWT_SECRET,
-//             {
-//                 expiresIn: "1h",
-//             }
-//         );
+    await newAdmin.save();
+    return res.status(201).json({ success: true, message: 'Admin registered successfully' });
 
-//         res.json({ bearerToken: `Bearer ${token}`, admin });
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// });
+  } catch (error) {
+    console.error('Admin registration error:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
 
-// // ✅ Admin Dashboard (protected)
-// router.get("/dashboard", verifyToken, isAdmin, async (req, res) => {
-//     res.json({ message: "Welcome to the Admin Dashboard" });
-// });
+// ========================
+// Admin Login Route
+// ========================
+router.post('/admin-login', async (req, res) => {
+  const { email, password } = req.body;
 
-// // ✅ Admin: View All Clients
-// router.get("/clients", verifyToken, isAdmin, async (req, res) => {
-//     try {
-//         const clients = await Client.find().populate("company");
-//         res.json(clients);
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// });
+  try {
+    const user = await User.findOne({ email });
 
-// module.exports = router;
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Access denied: Not an admin' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Invalid password' });
+    }
+
+    const token = generateToken(user);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Admin login successful',
+      token,
+      role: user.role,
+      email: user.email
+    });
+
+  } catch (error) {
+    console.error('Admin login error:', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+
+
+
+
+
+module.exports = router;
