@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+
+  <style>
+    body {
+      background-color: #f4f6fa;
+    }
+    .client-table th, .client-table td {
+      vertical-align: middle;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1050;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 400px;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .right-btn {
+      float: right;
+    }
+  </style>
+</head>
+<body>
+  <!-- Include Navigation -->
+  <div id="nav-placeholder"></div>
+
+  <!-- Main Content -->
+  <div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>Clients</h2>
+      <button class="btn btn-primary" onclick="openModal('addClientModal')">+ Add Client</button>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Email</th>
+              <th>Companies Created</th>
+              <th>Modifications</th>
+            </tr>
+          </thead>
+          <tbody id="client-table-body">
+            <!-- Injected by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Client Modal -->
+  <div id="addClientModal" class="modal-overlay">
+    <div class="modal-box">
+      <h5 class="mb-3">Add Client</h5>
+      <form id="add-client-form">
+        <input type="email" id="addEmail" class="form-control mb-2" placeholder="Email" required />
+        <input type="password" id="addPassword" class="form-control mb-3" placeholder="Password" required />
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Add</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addClientModal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Client Modal -->
+  <div id="editClientModal" class="modal-overlay">
+    <div class="modal-box">
+      <h5 class="mb-3">Edit Client</h5>
+      <form id="edit-client-form">
+        <input type="hidden" id="editClientId" />
+        <input type="email" id="editEmail" class="form-control mb-2" placeholder="New Email" required />
+        <input type="password" id="editPassword" class="form-control mb-3" placeholder="New Password" required />
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-success">Save</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal('editClientModal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  function openModal(id) {
+    document.getElementById(id).classList.add('show');
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('show');
+  }
+
+
+
+</script>
+
+  
+  <script type="module" src="./scripts/admin-dashboard.js"></script>
+  <script>
+  fetch("nav_admin.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("nav-placeholder").innerHTML = html;
+
+      // ✅ Attach logout logic after navbar is injected
+      const logoutBtn = document.getElementById("logout-btn");
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+          localStorage.removeItem("adminToken");
+          window.location.href = "login.html";
+        });
+      }
+    });
+</script>
+
+
+</body>
+</html>
