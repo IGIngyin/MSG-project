@@ -48,7 +48,7 @@ router.post("/register", async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newClient = new Client({ name, email, password: hashedPassword, phone });
+    const newClient = new Client({ name, email: email.toLowerCase(), password: hashedPassword, phone });
 
     await newClient.save();
     res.status(201).json({ message: "Client registered successfully" });
@@ -83,7 +83,7 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const client = await Client.findOne({ email }).populate("company");
+    const client = await Client.findOne({ email: email.toLowerCase() }).populate("company");
 
     if (!client || !(await bcrypt.compare(password, client.password))) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -181,7 +181,7 @@ const crypto = require("crypto");
 router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
   try {
-    const client = await Client.findOne({ email });
+    const client = await Client.findOne({ email: email.toLowerCase() });
     if (!client) {
       return res.status(404).json({ error: "Client not found" });
     }
@@ -200,7 +200,7 @@ router.post("/forgot-password", async (req, res) => {
 
     await transporter.sendMail({
       from: `"Client Portal" <${process.env.EMAIL_USERNAME}>`,
-      to: email,
+      to: email.toLowerCase(),
       subject: "Reset your password",
       html: `
         <p>You requested to reset your password.</p>

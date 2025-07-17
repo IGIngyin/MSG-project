@@ -8,7 +8,7 @@ loadScripts();
 document.getElementById("forgot-password-form").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const email = document.getElementById("email").value;
+  const email = document.getElementById("email").value.trim().toLowerCase();
   const messageDiv = document.getElementById("message");
 
   try {
