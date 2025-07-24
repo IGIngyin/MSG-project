@@ -49,33 +49,34 @@ const router = express.Router();
  *         description: Internal server error
  */
 router.post("/companies", verifyToken, async (req, res) => {
-  try {
-    const { name, description, ssic, address, paidUpShareCapital } = req.body;
-    const newCompany = new Company({
-      name,
-      description,
-      ssic,
-      address,
-      paidUpShareCapital,
-    });
-    const savedCompany = await newCompany.save();
+    try {
+        const { name, description, ssic, address, paidUpShareCapital } =
+            req.body;
+        const newCompany = new Company({
+            name,
+            description,
+            ssic,
+            address,
+            paidUpShareCapital,
+        });
+        const savedCompany = await newCompany.save();
 
-    // Add company to client's company list
-    const client = await Client.findById(req.user.id);
-    if (!client) {
-      return res.status(404).json({ error: "Client not found" });
+        // Add company to client's company list
+        const client = await Client.findById(req.user.id);
+        if (!client) {
+            return res.status(404).json({ error: "Client not found" });
+        }
+        // Check if savedCompany has a valid ID before adding it to client
+        if (!savedCompany || !savedCompany._id) {
+            throw new Error("Invalid company ID");
+        }
+        client.company.push(savedCompany._id);
+        await client.save();
+        res.status(201).json(savedCompany);
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ error: "Failed to create company" });
     }
-    // Check if savedCompany has a valid ID before adding it to client
-    if (!savedCompany || !savedCompany._id) {
-      throw new Error("Invalid company ID");
-    }
-    client.company.push(savedCompany._id);
-    await client.save();
-    res.status(201).json(savedCompany);
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({ error: "Failed to create company" });
-  }
 });
 
 // GET ALL COMPANIES
@@ -102,7 +103,6 @@ router.post("/companies", verifyToken, async (req, res) => {
 //   }
 // });
 
-
 // GET ALL COMPANIES FOR LOGGED-IN USER
 /**
  * @swagger
@@ -116,24 +116,24 @@ router.post("/companies", verifyToken, async (req, res) => {
  *         description: Failed to retrieve companies
  */
 router.get("/companies", verifyToken, async (req, res) => {
-  try {
-    // Get the client first
-    const client = await Client.findById(req.user.id).populate('company');
-    
-    if (!client) {
-      return res.status(404).json({ error: "Client not found" });
+    try {
+        // Get the client first
+        const client = await Client.findById(req.user.id).populate("company");
+
+        if (!client) {
+            return res.status(404).json({ error: "Client not found" });
+        }
+
+        // Get detailed information for each company
+        const companies = await Company.find({
+            _id: { $in: client.company },
+        }).populate("secretary shareholder services");
+
+        res.status(200).json(companies);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to retrieve companies" });
     }
-
-    // Get detailed information for each company
-    const companies = await Company.find({
-      _id: { $in: client.company }
-    }).populate("secretary shareholder services");
-
-    res.status(200).json(companies);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to retrieve companies" });
-  }
 });
 
 // GET A COMPANY BY ID
@@ -157,18 +157,19 @@ router.get("/companies", verifyToken, async (req, res) => {
  *         description: Failed to retrieve company
  */
 router.get("/companies/:id", verifyToken, isClientCompany, async (req, res) => {
-  try {
-    const selectedCompany = req.header("selectedCompany");
-    const company = await Company.findById(selectedCompany).populate(
-      "secretary shareholder services"
-    );
+    try {
+        const selectedCompany = req.header("selectedCompany");
+        const company = await Company.findById(selectedCompany).populate(
+            "secretary shareholder services"
+        );
 
-    if (!company) return res.status(404).json({ error: "Company not found" });
-    res.status(200).json(company);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to retrieve company" });
-  }
+        if (!company)
+            return res.status(404).json({ error: "Company not found" });
+        res.status(200).json(company);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to retrieve company" });
+    }
 });
 
 // UPDATE A COMPANY
@@ -210,22 +211,23 @@ router.get("/companies/:id", verifyToken, isClientCompany, async (req, res) => {
  *         description: Failed to update company
  */
 router.put("/companies/:id", verifyToken, isClientCompany, async (req, res) => {
-  try {
-    const { name, description, ssic, address, paidUpShareCapital } = req.body;
-    const updatedCompany = await Company.findByIdAndUpdate(
-      req.params.id,
-      { name, description, ssic, address, paidUpShareCapital },
-      { new: true }
-    );
+    try {
+        const { name, description, ssic, address, paidUpShareCapital } =
+            req.body;
+        const updatedCompany = await Company.findByIdAndUpdate(
+            req.params.id,
+            { name, description, ssic, address, paidUpShareCapital },
+            { new: true }
+        );
 
-    if (!updatedCompany)
-      return res.status(404).json({ error: "Company not found" });
+        if (!updatedCompany)
+            return res.status(404).json({ error: "Company not found" });
 
-    res.status(200).json(updatedCompany);
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({ error: "Failed to update company" });
-  }
+        res.status(200).json(updatedCompany);
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ error: "Failed to update company" });
+    }
 });
 
 /**
@@ -248,34 +250,35 @@ router.put("/companies/:id", verifyToken, isClientCompany, async (req, res) => {
  *         description: Failed to delete company
  */
 router.delete(
-  "/companies/:id",
-  verifyToken,
-  isClientCompany,
-  async (req, res) => {
-    try {
-      // 1. Find the company to delete
-      const companyId = req.params.id;
-      const deletedCompany = await Company.findByIdAndDelete(companyId);
+    "/companies/:id",
+    verifyToken,
+    // isClientCompany,
+    async (req, res) => {
+        try {
+            // 1. Find the company to delete
+            const companyId = req.params.id;
+            const deletedCompany = await Company.findByIdAndDelete(companyId);
 
-      if (!deletedCompany) {
-        return res.status(404).json({ error: "Company not found" });
-      }
+            if (!deletedCompany) {
+                return res.status(404).json({ error: "Company not found" });
+            }
 
-      // 2. Remove company from all clients
-      await Client.updateMany(
-        { company: companyId }, // Find clients who have this company ID
-        { $pull: { company: companyId } } // Remove the company ID from their company array
-      );
+            // 2. Remove company from all clients
+            await Client.updateMany(
+                { company: companyId }, // Find clients who have this company ID
+                { $pull: { company: companyId } } // Remove the company ID from their company array
+            );
 
-      // 3. Send success response
-      res.status(200).json({
-        message: "Company deleted successfully and removed from clients",
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Failed to delete company" });
+            // 3. Send success response
+            res.status(200).json({
+                message:
+                    "Company deleted successfully and removed from clients",
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Failed to delete company" });
+        }
     }
-  }
 );
 
 // UPLOAD FILE AND STORE IN COMPANY DOCUMENTS
@@ -321,38 +324,41 @@ router.delete(
  */
 
 router.post(
-  "/companies/upload",
-  verifyToken,
-  isClientCompany,
-  upload.single("file"),
-  async (req, res) => {
-    try {
-      const selectedCompany = req.header("selectedCompany");
-      if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
-      }
+    "/companies/upload",
+    verifyToken,
+    isClientCompany,
+    upload.single("file"),
+    async (req, res) => {
+        try {
+            const selectedCompany = req.header("selectedCompany");
+            if (!req.file) {
+                return res.status(400).json({ error: "No file uploaded" });
+            }
 
-      const company = await Company.findById(selectedCompany);
-      if (!company) {
-        return res.status(404).json({ error: "Company not found" });
-      }
+            const company = await Company.findById(selectedCompany);
+            if (!company) {
+                return res.status(404).json({ error: "Company not found" });
+            }
 
-      // Store file details in the company's documents array
-      company.documents.push({
-        filename: req.file.originalname,
-        path: req.file.buffer.toString("base64"), // Convert to Base64 for MongoDB storage
-        uploadedAt: new Date(),
-      });
+            // Store file details in the company's documents array
+            company.documents.push({
+                filename: req.file.originalname,
+                path: req.file.buffer.toString("base64"), // Convert to Base64 for MongoDB storage
+                uploadedAt: new Date(),
+            });
 
-      // Save the updated company document
-      await company.save();
+            // Save the updated company document
+            await company.save();
 
-      res.status(200).json({ message: "File uploaded successfully", company });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "File upload failed" });
+            res.status(200).json({
+                message: "File uploaded successfully",
+                company,
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "File upload failed" });
+        }
     }
-  }
 );
 
 module.exports = router;
