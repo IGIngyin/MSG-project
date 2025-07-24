@@ -97,9 +97,9 @@ function setupSidebarTabs() {
                             </button>
                         </div>
                         <p>Current Balance: <strong>$${clientData.credits.toFixed(
-                        2
-                    )}</strong></p>
-                        ${topUpCreditsModalHTML()}
+                            2
+                        )}
+                    
                     `;
                     break;
 
@@ -234,8 +234,9 @@ function topUpCreditsModalHTML() {
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <input type="hidden" id="client-id-for-topup" value="${clientData._id || ""
-        }">
+              <input type="hidden" id="client-id-for-topup" value="${
+                  clientData._id || ""
+              }">
               <div class="mb-3">
                 <label for="top-up-amount" class="form-label">Amount to Add</label>
                 <input type="number" id="top-up-amount" class="form-control" required min="1" step="0.01">
@@ -267,18 +268,22 @@ async function fetchCompanyList() {
     <div class="card mb-2 shadow-sm">
         <div class="card-body p-2">
             <div class="d-flex justify-content-between align-items-center">
-                <div onclick="selectCompany('${c._id}', '${c.name
-                    }')" style="cursor:pointer;">
+                <div onclick="selectCompany('${c._id}', '${
+                    c.name
+                }')" style="cursor:pointer;">
                     <strong>${c.name}</strong><br>
                     <small class="text-muted">${c.ssic || ""}</small>
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-sm btn-outline-primary" onclick="editCompany('${c._id
-                    }', '${c.name}', '${c.description}', '${c.address}', '${c.ssic
-                    }', ${c.paidUpShareCapital})">
+                    <button class="btn btn-sm btn-outline-primary" onclick="editCompany('${
+                        c._id
+                    }', '${c.name}', '${c.description}', '${c.address}', '${
+                    c.ssic
+                }', ${c.paidUpShareCapital})">
                         <i class="fa fa-edit"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteCompany('${c._id
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteCompany('${
+                        c._id
                     }')">
                         <i class="fa fa-trash"></i>
                     </button>
@@ -339,12 +344,15 @@ window.deleteCompany = async function (id) {
 // Global function to select a company and display its sub-tabs
 window.selectCompany = function (companyId, name) {
     document.getElementById("company-subtabs").innerHTML = `
-        <div class="btn-group-vertical w-100">
-          <button class="btn btn-outline-dark" onclick="loadSection('${companyId}', 'secretary')">Secretary Info</button>
-          <button class="btn btn-outline-dark" onclick="loadSection('${companyId}', 'shareholder')">Shareholders</button>
-          <button class="btn btn-outline-dark" onclick="loadSection('${companyId}', 'documents')">Documents</button>
+    <div class="card p-3 shadow-sm">
+        <div class="nav flex-column nav-pills gap-2" id="section-tabs">
+            <button class="nav-link" onclick="loadSection('${companyId}', 'secretary', this)">📋 Secretary Info</button>
+            <button class="nav-link" onclick="loadSection('${companyId}', 'shareholder', this)">👥 Shareholders</button>
+            <button class="nav-link" onclick="loadSection('${companyId}', 'documents', this)">📁 Documents</button>
         </div>
-    `;
+    </div>
+`;
+
     document.getElementById(
         "company-details"
     ).innerHTML = `<p>Select a section for <strong>${name}</strong>.</p>`;
@@ -381,8 +389,8 @@ window.loadSection = async function (companyId, section) {
 
                 html += data.secretary.length
                     ? data.secretary
-                        .map(
-                            (s) => `
+                          .map(
+                              (s) => `
             <div class="card mb-2 p-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
@@ -401,8 +409,8 @@ window.loadSection = async function (companyId, section) {
                 </div>
             </div>
         `
-                        )
-                        .join("")
+                          )
+                          .join("")
                     : "<p>No secretary info found.</p>";
 
                 break;
@@ -419,8 +427,8 @@ window.loadSection = async function (companyId, section) {
 
                 html += data.shareholder.length
                     ? data.shareholder
-                        .map(
-                            (sh) => `
+                          .map(
+                              (sh) => `
                             <div class="card mb-2 p-2">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
@@ -441,8 +449,8 @@ window.loadSection = async function (companyId, section) {
                                 </div>
                             </div>
                         `
-                        )
-                        .join("")
+                          )
+                          .join("")
                     : "<p>No shareholders found.</p>";
                 break;
             // Inside window.loadSection function, for case "documents":
@@ -768,7 +776,9 @@ document.addEventListener("submit", async (e) => {
                 throw new Error(errorData.message || "Save failed");
             }
 
-            const modal = bootstrap.Modal.getInstance(document.getElementById("companyModal"));
+            const modal = bootstrap.Modal.getInstance(
+                document.getElementById("companyModal")
+            );
             modal?.hide();
             document.body.classList.remove("modal-open");
             document.querySelector(".modal-backdrop")?.remove();
@@ -849,7 +859,9 @@ document.addEventListener("submit", async (e) => {
                 throw new Error(data.error || "Failed to save secretary");
             }
 
-            const modal = bootstrap.Modal.getInstance(document.getElementById("secretaryModal"));
+            const modal = bootstrap.Modal.getInstance(
+                document.getElementById("secretaryModal")
+            );
             modal?.hide();
             document.body.classList.remove("modal-open");
             document.querySelector(".modal-backdrop")?.remove();
@@ -912,7 +924,9 @@ document.addEventListener("submit", async (e) => {
                 throw new Error(data.error || "Failed to save shareholder");
             }
 
-            const modal = bootstrap.Modal.getInstance(document.getElementById("shareholderModal"));
+            const modal = bootstrap.Modal.getInstance(
+                document.getElementById("shareholderModal")
+            );
             modal?.hide();
             document.body.classList.remove("modal-open");
             document.querySelector(".modal-backdrop")?.remove();
