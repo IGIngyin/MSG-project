@@ -81,19 +81,19 @@ router.get("/services/:serviceId", async (req, res) => {
  */
 router.post("/services", async (req, res) => {
   try {
-    const { name, description, category, cost } = req.body;
+    const { name, description, category, pricing } = req.body;
 
-    if (!name || !description || !category || cost === undefined) {
+    if (!name || !description || !category || !pricing || pricing.monthly === undefined) {
       return res
         .status(400)
-        .json({ message: "Name, description, category and cost are required" });
+        .json({ message: "Name, description, category and pricing.monthly are required" });
     }
 
     const newService = new Service({
       name,
       description,
       category,
-      cost,
+      pricing
     });
 
     await newService.save();
@@ -102,6 +102,7 @@ router.post("/services", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // UPDATE A SERVICE
 /**
@@ -138,7 +139,7 @@ router.post("/services", async (req, res) => {
  */
 router.put("/services/:serviceId", async (req, res) => {
   try {
-    const { name, description, category, cost } = req.body;
+    const { name, description, category, pricing } = req.body;
 
     const service = await Service.findById(req.params.serviceId);
     if (!service) {
@@ -148,7 +149,7 @@ router.put("/services/:serviceId", async (req, res) => {
     service.name = name || service.name;
     service.description = description || service.description;
     service.category = category || service.category;
-    service.cost = cost !== undefined ? cost : service.cost;
+    service.pricing = pricing || service.pricing;
 
     await service.save();
     res.status(200).json(service);
@@ -156,6 +157,7 @@ router.put("/services/:serviceId", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // DELETE A SERVICE
 /**

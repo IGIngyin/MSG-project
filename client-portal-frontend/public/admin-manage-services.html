@@ -7,38 +7,17 @@
  </head>
 <body>
 
-    <!-- Navbar Section -->
-    <div id="navbar-placeholder"></div>
+  <!-- Navbar Section -->
+  <div id="navbar-placeholder"></div>
 
-    <h2 class="mb-4 text-center">Admin - Manage Services</h2>
-
-    <div class="container mt-4">
-        <!-- Service Form -->
-        <div class="card p-3 mb-4">
-            <h5 id="form-title">Add New Service</h5>
-            <form id="service-form">
-                <input type="hidden" id="service-id">
-                <div class="mb-3">
-                    <label class="form-label">Name</label>
-                    <input type="text" id="name" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Description</label>
-                    <input type="text" id="description" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Category</label>
-                    <input type="text" id="category" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Cost</label>
-                    <input type="number" id="cost" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
-                <button type="button" class="btn btn-secondary" id="reset-form-button">Cancel</button>
-            </form>
-        </div>
-
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="mb-0">Admin - Manage Services</h2>
+      <!-- Add Button -->
+      <button class="btn btn-primary" onclick="showAddServiceModal()">
+        <i class="fa fa-plus"></i> Add Service
+      </button>
+    </div>
         <!-- Services Table -->
         <table class="table table-bordered">
             <thead class="table-dark">
@@ -53,9 +32,48 @@
             <tbody id="service-list"></tbody>
         </table>
 
-        <br>
-        <!--<a href="/profile.html" class="btn btn-secondary m-3"> Back </a>-->
+  <!-- Service Modal -->
+  <div class="modal fade" id="serviceModal" tabindex="-1" aria-labelledby="serviceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="form-title">Add New Service</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="service-form">
+            <input type="hidden" id="service-id" />
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input type="text" id="name" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              <input type="text" id="description" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Category</label>
+              <input type="text" id="category" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Monthly Price</label>
+              <input type="number" id="monthly" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Yearly Price (optional)</label>
+              <input type="number" id="yearly" class="form-control" />
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">
+                <i class="fa fa-save"></i> Save
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 
     <!-- Footer Section -->
     <div id="footer-placeholder"></div>
