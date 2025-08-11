@@ -1,128 +1,164 @@
-import { displayNav, loadScripts } from './common.js';  // Import the function from common.js
+import { displayNav, loadScripts } from './common.js';
 
 // Load the navbar HTML content into the placeholder
 displayNav();
-// Load all css/js scripts
 loadScripts();
 
 const API_BASE_URL = "/api/service";
 
-// Fetch and display all services
+window.showAddServiceModal = function showAddServiceModal() {
+  document.getElementById("service-id").value = "";
+  document.getElementById("service-form").reset();
+  document.getElementById("form-title").textContent = "Add New Service";
+
+  const el = document.getElementById("serviceModal");
+  const modal = bootstrap.Modal.getOrCreateInstance(el);
+  modal.show();
+};
+
+// Fetch and display all services 
 async function fetchServices() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/services`, {
-            headers: {
-                'token': `${localStorage.getItem('token')}`
-            }
-        });
-        const services = await response.json();
-        const tableBody = document.getElementById("service-list");
-        tableBody.innerHTML = "";
+  try {
+    const response = await fetch(`${API_BASE_URL}/services`, {
+      headers: {
+        // optional; mirrors your other pages
+        token: `${localStorage.getItem('token')}`
+      }
+    });
+    const services = await response.json();
+    const tableBody = document.getElementById("service-list");
+    tableBody.innerHTML = "";
 
-        services.forEach(s => {
-            // Create row
-            const row = document.createElement("tr");
+    services.forEach(s => {
+      const row = document.createElement("tr");
 
-            // Populate row with service data
-            row.innerHTML = `
-                <td>${s.name}</td>
-                <td>${s.description}</td>
-                <td>${s.category}</td>
-                <td>${s.cost}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm edit-btn">
-                        <i class="fa fa-edit"></i> Edit
-                    </button>
-                    <button class="btn btn-danger btn-sm delete-btn">
-                        <i class="fa fa-trash"></i> Delete
-                    </button>
-                </td>
-            `;
+      const hasYearly = s.pricing && s.pricing.yearly !== undefined;
 
-            // Add event listeners to buttons
-            row.querySelector(".edit-btn").addEventListener("click", () => {
-                editService(s._id, s.name, s.description, s.category, s.cost);
-            });
+      row.innerHTML = `
+        <td>${s.name}</td>
+        <td>${s.description}</td>
+        <td>${s.category}</td>
+        <td>
+          <strong>Monthly:</strong> $${s.pricing?.monthly ?? '—'}<br>
+          ${hasYearly ? `<strong>Yearly:</strong> $${s.pricing.yearly}` : `<em>No yearly plan</em>`}
+        </td>
+        <td>
+          <button class="btn btn-warning btn-sm edit-btn">
+            <i class="fa fa-edit"></i> Edit
+          </button>
+          <button class="btn btn-danger btn-sm delete-btn">
+            <i class="fa fa-trash"></i> Delete
+          </button>
+        </td>
+      `;
 
-            row.querySelector(".delete-btn").addEventListener("click", () => {
-                deleteService(s._id);
-            });
+      row.querySelector(".edit-btn").addEventListener("click", () => {
+        editService(s._id, s.name, s.description, s.category, s.pricing);
+      });
 
-            // Append row to table
-            tableBody.appendChild(row);
-        });
-    } catch (error) {
-        console.error("Failed to fetch services", error);
-    }
+      row.querySelector(".delete-btn").addEventListener("click", () => {
+        deleteService(s._id);
+      });
+
+      tableBody.appendChild(row);
+    });
+  } catch (error) {
+    console.error("Failed to fetch services", error);
+  }
 }
 
-// Create or update a service
+// Create or update a service (modal form submit)
 document.getElementById("service-form").addEventListener("submit", async function (e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    const id = document.getElementById("service-id").value;
-    const name = document.getElementById("name").value;
-    const description = document.getElementById("description").value;
-    const category = document.getElementById("category").value;
-    const cost = document.getElementById("cost").value;
+  const id = document.getElementById("service-id").value;
+  const name = document.getElementById("name").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const category = document.getElementById("category").value.trim();
+  const monthly = parseFloat(document.getElementById("monthly").value);
+  const yearlyValue = document.getElementById("yearly").value;
+  const yearly = yearlyValue !== "" ? parseFloat(yearlyValue) : undefined;
 
-    const method = id ? "PUT" : "POST";
-    const endpoint = id ? `${API_BASE_URL}/services/${id}` : `${API_BASE_URL}/services`;
+  if (!name || !description || !category) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+  if (isNaN(monthly)) {
+    alert("Monthly price must be a number.");
+    return;
+  }
 
-    try {
-        const response = await fetch(endpoint, {
-            method,
-            headers: {
-                "Content-Type": "application/json",
-                'token': `${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ name, description, category, cost })
-        });
+  const pricing = yearly !== undefined && !isNaN(yearly)
+    ? { monthly, yearly }
+    : { monthly };
 
-        if (!response.ok) throw new Error("Failed to save service");
-        document.getElementById("service-form").reset();
-        fetchServices();
-    } catch (error) {
-        console.error(error);
+  const method = id ? "PUT" : "POST";
+  const endpoint = id ? `${API_BASE_URL}/services/${id}` : `${API_BASE_URL}/services`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        token: `${localStorage.getItem('token')}` // keep consistent with your other pages
+      },
+      body: JSON.stringify({ name, description, category, pricing })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(errText || "Failed to save service");
     }
+
+    // close modal
+    const el = document.getElementById("serviceModal");
+    const modal = bootstrap.Modal.getOrCreateInstance(el);
+    modal.hide();
+
+    // reset + refresh
+    document.getElementById("service-form").reset();
+    document.getElementById("service-id").value = "";
+    document.getElementById("form-title").textContent = "Add New Service";
+    fetchServices();
+  } catch (error) {
+    console.error("Service Save Error:", error);
+    alert("Error saving service: " + error.message);
+  }
 });
 
-// Edit services (pre-fill form)
-function editService(id, name, description, category, cost) {
-    document.getElementById("service-id").value = id;
-    document.getElementById("name").value = name;
-    document.getElementById("description").value = description;
-    document.getElementById("category").value = category;
-    document.getElementById("cost").value = cost;
-    document.getElementById("form-title").textContent = "Edit Service";
+//Pre-fill form for editing and open modal 
+function editService(id, name, description, category, pricing) {
+  document.getElementById("service-id").value = id;
+  document.getElementById("name").value = name;
+  document.getElementById("description").value = description;
+  document.getElementById("category").value = category;
+  document.getElementById("monthly").value = pricing?.monthly ?? '';
+  document.getElementById("yearly").value = pricing?.yearly ?? '';
+  document.getElementById("form-title").textContent = "Edit Service";
+
+  const el = document.getElementById("serviceModal");
+  const modal = bootstrap.Modal.getOrCreateInstance(el);
+  modal.show();
 }
 
-// Delete service
+// Delete service 
 async function deleteService(id) {
-    if (!confirm("Are you sure you want to delete this service?")) return;
+  if (!confirm("Are you sure you want to delete this service?")) return;
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/services/${id}`, {
-            method: "DELETE",
-            headers: { 
-                'token': `${localStorage.getItem('token')}`
-            }
-        });
+  try {
+    const response = await fetch(`${API_BASE_URL}/services/${id}`, {
+      method: "DELETE",
+      headers: {
+        token: `${localStorage.getItem('token')}`
+      }
+    });
 
-        if (!response.ok) throw new Error("Failed to delete service");
-        fetchServices();
-    } catch (error) {
-        console.error(error);
-    }
+    if (!response.ok) throw new Error("Failed to delete service");
+    fetchServices();
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-// Reset form
-document.getElementById("reset-form-button").addEventListener("click", async function (e) {
-    e.preventDefault();
-    document.getElementById("service-id").value = "";
-    document.getElementById("service-form").reset();
-    document.getElementById("form-title").textContent = "Add New Service";
-})
-
-// Load services on page load
+// Load services on page load 
 fetchServices();
