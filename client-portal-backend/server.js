@@ -11,6 +11,8 @@ const adminCompanyRoutes = require('./routes/adminCompanies');
 const adminSecretaryRoutes = require('./routes/adminSecretaries');
 const adminShareholderRoutes = require('./routes/adminShareholders');
 const adminDocumentRoutes = require('./routes/adminDocuments');
+const serviceRoutes = require('./routes/serviceRoutes');
+
 
 
 dotenv.config();
@@ -76,7 +78,6 @@ app.use("/api/clients", require("./routes/clientRoutes"));
 app.use("/api/companies", require("./routes/companyRoutes"));
 app.use("/api/secretaries", require("./routes/secretaryRoutes"));
 app.use("/api/shareholders", require("./routes/shareholderRoutes"));
-app.use("/api/service", require("./routes/serviceRoutes"));
 app.use("/api/transactions", require("./routes/transactionRoutes"));
 app.use("/api/documents", require("./routes/documentRoutes"));
 app.use('/api/admin', adminRoutes);
@@ -85,6 +86,7 @@ app.use('/api/admin/companies', adminCompanyRoutes);
 app.use('/api/admin/secretaries', adminSecretaryRoutes);
 app.use('/api/admin/shareholders', adminShareholderRoutes);
 app.use('/api/admin/documents', adminDocumentRoutes);
+app.use('/api/service', serviceRoutes);
 
 // Start the server
 app.listen(PORT, () => {

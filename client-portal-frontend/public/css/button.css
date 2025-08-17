@@ -1,0 +1,45 @@
+/* Common button styles for Edit & Delete */
+.custom-edit-btn,
+.custom-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+/* Edit Button */
+.custom-edit-btn {
+  background-color: #f0f4ff;
+  color: #0d6efd;
+}
+
+.custom-edit-btn i {
+  color: #0d6efd;
+}
+
+.custom-edit-btn:hover {
+  background-color: #dbe9ff;
+  color: #0a58ca;
+}
+
+/* Delete Button */
+.custom-delete-btn {
+  background-color: #fef6f0;
+  color: #d9534f;
+}
+
+.custom-delete-btn i {
+  color: #ff9800;
+}
+
+.custom-delete-btn:hover {
+  background-color: #fde4dc;
+  color: #c9302c;
+}
