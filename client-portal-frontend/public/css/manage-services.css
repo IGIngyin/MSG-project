@@ -1,0 +1,79 @@
+:root{
+  --bg:#f5f7fb;
+  --indigo-700:#4338ca;
+  --indigo-800:#3730a3;
+  --text:#0f172a;
+  --muted:#64748b;
+  --card:#ffffff;
+  --ok:#10b981;
+  --shadow:0 8px 24px rgba(17,24,39,.08);
+  --chip-blue:#1d4ed8;
+}
+
+body{ background:var(--bg); }
+
+/* hero */
+.hero{
+  background:linear-gradient(180deg,var(--indigo-700),var(--indigo-800));
+  color:#fff; border-radius:20px; padding:22px; margin:0;
+  box-shadow:var(--shadow); border-top-left-radius:0; border-bottom-left-radius:0;
+}
+.hero .avatar{
+  width:56px;height:56px;border-radius:9999px;display:grid;place-items:center;
+  font-weight:700;background:rgba(255,255,255,.18); font-size:1.25rem;
+}
+.tiles{ gap:18px; }
+.tile{
+  min-width:160px;background:rgba(255,255,255,.08);border-radius:16px;padding:12px 16px;
+  text-align:center; backdrop-filter: blur(2px);
+}
+.tile .num{ font-size:1.5rem; font-weight:800; }
+.tile .label{ opacity:.85; font-size:.9rem; }
+
+/* back */
+.back-btn{
+  width:44px;height:44px;border-radius:999px;display:grid;place-items:center;
+  color:#fff;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);
+}
+.back-btn:hover{ background:rgba(255,255,255,.16); color:#fff; }
+
+/* controls */
+.searchbox{ position:relative; }
+.searchbox input{ padding-left:2.25rem; min-width:260px; }
+.searchbox .search-icon{ position:absolute;left:.6rem;top:50%;transform:translateY(-50%);opacity:.65;pointer-events:none; }
+.view-tabs .btn{ border-radius:999px; }
+.view-tabs .btn.active{ background:#eef2ff; border-color:#e0e7ff; }
+
+/* chip buttons */
+.chip-btn{
+  display:inline-flex;align-items:center;gap:.5rem;border:1px solid #D5E4FF;
+  background:#fff;color:var(--chip-blue);padding:.5rem 1rem;border-radius:999px;font-weight:600;
+  box-shadow:0 2px 8px rgba(29,78,216,.12);transition:.15s;line-height:1;
+}
+.chip-btn i{ font-size:1rem; }
+.chip-btn:hover{ transform:translateY(-1px); box-shadow:0 6px 16px rgba(29,78,216,.18); }
+.chip-edit{ }
+.chip-delete{ color:#dc2626; border-color:#ffd8bd; }
+.chip-delete i{ color:#ea580c; }
+.chip-delete:hover{ background:#fff1ed; }
+
+/* cards */
+.service-card{
+  background:var(--card); border-radius:18px; box-shadow:var(--shadow); overflow:hidden;
+}
+.service-card .topbar{ height:6px; background:linear-gradient(90deg,#2563eb,#7c3aed); }
+.service-card .content{ padding:18px; }
+.service-bubble{
+  width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+  background:#e0e7ff;color:#1d4ed8;font-size:1.2rem;
+}
+.service-title{ font-weight:700; font-size:1.1rem; }
+.badge-cat{
+  display:inline-block; background:#fff3cd; color:#a16207; font-weight:700;
+  border-radius:999px; padding:.25rem .6rem; font-size:.75rem;
+}
+.mini-box{
+  background:#f1f5f9;border-radius:12px;padding:10px 12px;font-weight:700;text-align:center;
+}
+.mini-label{ font-size:.72rem; color:var(--muted); }
+.actions{ display:flex; gap:8px; justify-content:flex-end; }
