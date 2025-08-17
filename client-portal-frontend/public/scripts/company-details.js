@@ -154,6 +154,7 @@ actions.append(
   createEditButton(() => showEditSecretaryModal(s._id, s.name, s.email, s.contact)),
   createDeleteButton(() => deleteSecretary(s._id))
 );
+tbody.appendChild(tr);
 
   });
 }
@@ -280,32 +281,34 @@ actions.append(
   )),
   createDeleteButton(() => deleteShareholder(s._id))
 );
+frag.appendChild(col);
 
   });
   host.appendChild(frag);
 }
 
 function renderShareholderTable(list){
-  const tbody = ui.shr.tbody(); tbody.innerHTML = '';
+  const tbody = ui.shr.tbody(); 
+  tbody.innerHTML = '';
   list.forEach(s=>{
     const tr = document.createElement('tr');
     tr.innerHTML = `
-  <td>${s.name||''}</td>
-  <td>${s.email||''}</td>
-  <td>${s.contact||''}</td>
-  <td>${s.id || '-'}</td>
-  <td>${s.ordinaryShareNumber ?? 0}</td>
-  <td><div class="d-flex gap-2 actions"></div></td>
-`;
-const actions = tr.querySelector('.actions');
-actions.append(
-  createEditButton(() => showEditShareholderModal(
-    s._id, s.name, s.email, s.contact, s.ordinaryShareNumber, s.id
-  )),
-  createDeleteButton(() => deleteShareholder(s._id))
-);
-
+      <td>${s.name||''}</td>
+      <td>${s.email||''}</td>
+      <td>${s.contact||''}</td>
+      <td>${s.id || '-'}</td>
+      <td>${Number.isFinite(+s.ordinaryShareNumber) ? +s.ordinaryShareNumber : 0}</td>
+      <td><div class="d-flex gap-2 actions"></div></td>
+    `;
+    const actions = tr.querySelector('.actions');
+    actions.append(
+      createEditButton(() => showEditShareholderModal(
+        s._id, s.name, s.email, s.contact, s.ordinaryShareNumber, s.id
+      )),
+      createDeleteButton(() => deleteShareholder(s._id))
+    );
     
+    tbody.appendChild(tr);
   });
 }
 
