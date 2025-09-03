@@ -87,7 +87,7 @@ function updateClientInfo() {
     localStorage.setItem("userName", clientData.name || "User");
 }
 
-// ---------- Edit Profile (NEW) ----------
+// ---------- Edit Profile  ----------
 function openEditProfile() {
     document.getElementById("ep-name").value = clientData?.name || "";
     document.getElementById("ep-email").value = clientData?.email || "";
@@ -131,7 +131,7 @@ async function onSaveProfile(e) {
     }
 }
 
-// ---------- Change Password (NEW) ----------
+// ---------- Change Password  ----------
 function openChangePassword() {
     ["current-password", "new-password", "confirm-password"].forEach((id) => {
         const el = document.getElementById(id);

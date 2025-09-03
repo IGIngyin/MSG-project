@@ -3,7 +3,6 @@ import { displayNav, loadScripts } from "./common.js";
 displayNav();
 // loadScripts();
 
-// ----- Config -----
 const TOKEN = () => localStorage.getItem("token");
 const COMPANY_ID = () => localStorage.getItem("selectedCompany");
 
@@ -540,7 +539,6 @@ function applyFilters() {
     });
 }
 
-// ----- Empty / Loading -----
 function emptyState(section) {
     const map = {
         secretaries: {
@@ -751,7 +749,7 @@ function validateShareholderFields() {
 }
 
 // ----- Save Handlers -----
-// ----- Save Handlers -----
+
 const onSaveSecretary = (existing) => async (e) => {
     e.preventDefault();
     if (!validateSecretaryFields()) {
@@ -966,6 +964,40 @@ function shareholderModalHtml(existing) {
         </div>
       </form>
     </div></div>
+  </div>`;
+}
+function documentModalHtml() {
+    return `
+  <div class="modal fade" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Upload Document</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <form id="document-form" enctype="multipart/form-data" novalidate>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label" for="document-file">Select file</label>
+              <input
+                type="file"
+                id="document-file"
+                class="form-control"
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.csv,.txt"
+                required
+              />
+             
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Upload</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>`;
 }
 
